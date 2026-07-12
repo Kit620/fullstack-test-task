@@ -7,7 +7,7 @@ from fastapi import HTTPException, UploadFile, status
 from src.models import StoredFile
 from src.repositories.file_repository import FileRepository
 from src.service import STORAGE_DIR
-from src.tasks import scan_file_for_threats
+from src.tasks import process_uploaded_file
 
 
 class FileService:
@@ -70,7 +70,7 @@ class FileService:
         await self._files.commit()
         await self._files.refresh(file_item)
 
-        scan_file_for_threats.delay(file_item.id)
+        process_uploaded_file.delay(file_item.id)
         return file_item
 
     async def update(self, file_id: str, title: str) -> StoredFile:
