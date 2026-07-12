@@ -35,8 +35,9 @@ class FileService:
         return file_item, stored_path
 
     async def create(self, title: str, upload_file: UploadFile) -> StoredFile:
-        content = await upload_file.read()
-        if not content:
+        chunk_size = 1024 * 1024
+        first_chunk = await upload_file.read(chunk_size)
+        if not first_chunk:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="File is empty"
             )
@@ -45,7 +46,14 @@ class FileService:
         suffix = Path(upload_file.filename or "").suffix
         stored_name = f"{file_id}{suffix}"
         stored_path = STORAGE_DIR / stored_name
-        stored_path.write_bytes(content)
+
+        size = 0
+        with stored_path.open("wb") as stored_file:
+            chunk = first_chunk
+            while chunk:
+                stored_file.write(chunk)
+                size += len(chunk)
+                chunk = await upload_file.read(chunk_size)
 
         file_item = StoredFile(
             id=file_id,
@@ -55,7 +63,7 @@ class FileService:
             mime_type=upload_file.content_type
             or mimetypes.guess_type(stored_name)[0]
             or "application/octet-stream",
-            size=len(content),
+            size=size,
             processing_status="uploaded",
         )
         await self._files.add(file_item)

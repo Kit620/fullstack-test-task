@@ -14,5 +14,9 @@ def get_alert_service(session: AsyncSession = Depends(get_session)) -> AlertServ
 
 
 @router.get("/alerts", response_model=list[AlertItem])
-async def list_alerts_view(service: AlertService = Depends(get_alert_service)):
-    return await service.list()
+async def list_alerts_view(
+    limit: int | None = None,
+    offset: int = 0,
+    service: AlertService = Depends(get_alert_service),
+):
+    return await service.list(limit, offset)

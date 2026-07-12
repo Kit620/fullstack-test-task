@@ -15,8 +15,12 @@ def get_file_service(session: AsyncSession = Depends(get_session)) -> FileServic
 
 
 @router.get("/files", response_model=list[FileItem])
-async def list_files_view(service: FileService = Depends(get_file_service)):
-    return await service.list()
+async def list_files_view(
+    limit: int | None = None,
+    offset: int = 0,
+    service: FileService = Depends(get_file_service),
+):
+    return await service.list(limit, offset)
 
 
 @router.post("/files", response_model=FileItem, status_code=201)
