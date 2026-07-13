@@ -20,9 +20,7 @@ class FileService:
     async def get_or_404(self, file_id: str) -> StoredFile:
         file_item = await self._files.get(file_id)
         if file_item is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="File not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
         return file_item
 
     async def get_download_target(self, file_id: str) -> tuple[StoredFile, Path]:
@@ -38,9 +36,7 @@ class FileService:
         chunk_size = 1024 * 1024
         first_chunk = await upload_file.read(chunk_size)
         if not first_chunk:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="File is empty"
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File is empty")
 
         file_id = str(uuid4())
         suffix = Path(upload_file.filename or "").suffix

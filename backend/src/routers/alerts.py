@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db import get_session
+from src.models import Alert
 from src.repositories.alert_repository import AlertRepository
 from src.schemas import AlertItem
 from src.services.alert_service import AlertService
@@ -18,5 +19,5 @@ async def list_alerts_view(
     limit: int | None = None,
     offset: int = 0,
     service: AlertService = Depends(get_alert_service),
-):
+) -> list[Alert]:
     return await service.list(limit, offset)
