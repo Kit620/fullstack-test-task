@@ -27,3 +27,10 @@ export async function uploadFile(title: string, file: File): Promise<FileItem> {
 export function downloadFileUrl(fileId: string): string {
   return apiUrl(`/files/${fileId}/download`);
 }
+
+export async function deleteFile(fileId: string): Promise<void> {
+  const response = await fetch(apiUrl(`/files/${fileId}`), { method: "DELETE" });
+  if (!response.ok) {
+    throw new Error("Не удалось удалить файл");
+  }
+}

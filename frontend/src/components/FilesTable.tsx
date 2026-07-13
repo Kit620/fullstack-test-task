@@ -6,9 +6,11 @@ import type { FileItem } from "@/types/file";
 type Props = {
   files: FileItem[];
   isLoading: boolean;
+  deletingId: string | null;
+  onDelete: (fileId: string) => void;
 };
 
-export function FilesTable({ files, isLoading }: Props) {
+export function FilesTable({ files, isLoading, deletingId, onDelete }: Props) {
   return (
     <Card className="shadow-sm border-0 mb-4">
       <Card.Header className="bg-white border-0 pt-4 px-4">
@@ -71,14 +73,32 @@ export function FilesTable({ files, isLoading }: Props) {
                       </td>
                       <td>{formatDate(file.created_at)}</td>
                       <td className="text-nowrap">
-                        <Button
-                          as="a"
-                          href={downloadFileUrl(file.id)}
-                          variant="outline-primary"
-                          size="sm"
-                        >
-                          Скачать
-                        </Button>
+                        <div className="d-flex gap-2">
+                          <Button
+                            as="a"
+                            href={downloadFileUrl(file.id)}
+                            variant="outline-primary"
+                            size="sm"
+                          >
+                            Скачать
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            disabled={deletingId === file.id}
+                            onClick={() => {
+                              if (window.confirm(`Удалить файл «${file.title}»?`)) {
+                                onDelete(file.id);
+                              }
+                            }}
+                          >
+                            {deletingId === file.id ? (
+                              <Spinner animation="border" size="sm" />
+                            ) : (
+                              "Удалить"
+                            )}
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))

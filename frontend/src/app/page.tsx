@@ -55,7 +55,12 @@ export default function Page() {
             </Alert>
           ) : null}
 
-          <FilesTable files={filesHook.files} isLoading={filesHook.isLoading} />
+          <FilesTable
+            files={filesHook.files}
+            isLoading={filesHook.isLoading}
+            deletingId={filesHook.deletingId}
+            onDelete={filesHook.remove}
+          />
           <AlertsTable alerts={alertsHook.alerts} isLoading={alertsHook.isLoading} />
         </Col>
       </Row>
