@@ -3,6 +3,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db import get_session
+from src.models import StoredFile
 from src.repositories.file_repository import FileRepository
 from src.schemas import FileItem, FileUpdate
 from src.services.file_service import FileService
@@ -19,7 +20,7 @@ async def list_files_view(
     limit: int | None = None,
     offset: int = 0,
     service: FileService = Depends(get_file_service),
-):
+) -> list[StoredFile]:
     return await service.list(limit, offset)
 
 
@@ -28,7 +29,7 @@ async def create_file_view(
     title: str = Form(...),
     file: UploadFile = File(...),
     service: FileService = Depends(get_file_service),
-):
+) -> StoredFile:
     return await service.create(title=title, upload_file=file)
 
 
@@ -36,7 +37,7 @@ async def create_file_view(
 async def get_file_view(
     file_id: str,
     service: FileService = Depends(get_file_service),
-):
+) -> StoredFile:
     return await service.get_or_404(file_id)
 
 
@@ -45,7 +46,7 @@ async def update_file_view(
     file_id: str,
     payload: FileUpdate,
     service: FileService = Depends(get_file_service),
-):
+) -> StoredFile:
     return await service.update(file_id=file_id, title=payload.title)
 
 
@@ -53,7 +54,7 @@ async def update_file_view(
 async def download_file(
     file_id: str,
     service: FileService = Depends(get_file_service),
-):
+) -> FileResponse:
     file_item, stored_path = await service.get_download_target(file_id)
     return FileResponse(
         path=stored_path,
